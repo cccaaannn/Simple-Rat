@@ -1,9 +1,6 @@
-
-public class server_main {
-	
+public class Server_Main {
 	public static void main(String[] args) {
-		
-		server_frame s = new server_frame();
-
+		int PORT = 12349;
+		Server_Frame s = new Server_Frame(PORT);
 	}
 }

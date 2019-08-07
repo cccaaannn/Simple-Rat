@@ -31,13 +31,18 @@ public class Client {
 	private ObjectInputStream input;
 
 
-	private String serverIP ="127.0.0.1";
+	private String serverIP;
+	private int serverPORT;
+	
+	
 	private Socket client;
 
 
 
 
-	Client(){
+	Client(String serverIP, int serverPORT){
+		this.serverIP = serverIP;
+		this.serverPORT = serverPORT;
 		startClient();
 	}	
 
@@ -53,7 +58,7 @@ public class Client {
 	 * if answer is yes than path is exists so clients waits for sending and server waits for receiving
 	 * if answer is no than both client and server quits operation so no one hangs 
 	 */
-	void OPERATION_send_clients_file_to_server(Message m) {
+	public void OPERATION_send_clients_file_to_server(Message m) {
 
 		//checks files existance
 		String path = m.value;
@@ -142,7 +147,7 @@ public class Client {
 	}
 
 
-	void OPERATION_show_message(Message m) {
+	public void OPERATION_show_message(Message m) {
 		JOptionPane.showMessageDialog(null,  m.value, "alert",JOptionPane.ERROR_MESSAGE);
 	}
 
@@ -191,7 +196,7 @@ public class Client {
 
 
 	//only sends file
-	void send_file(String path){
+	private void send_file(String path){
 		File f = new File(path);
 		byte[] content;
 
@@ -208,7 +213,7 @@ public class Client {
 	}
 
 	//only receives file
-	void receive_file(String path) {
+	private void receive_file(String path) {
 		File f = new File(path);
 
 		byte[] content;
@@ -233,7 +238,7 @@ public class Client {
 	//------------------------------------------------utility functions---------------------------------------------------
 
 
-	String create_new_dir(String name) {
+	private String create_new_dir(String name) {
 
 		File theDir = new File(name);
 
@@ -253,7 +258,7 @@ public class Client {
 	}
 
 
-	Message set_message(String control, String value) {
+	private Message set_message(String control, String value) {
 		Message m = new Message();
 		m.control = control;
 		m.value = value;
@@ -305,7 +310,7 @@ public class Client {
 
 			} 
 			catch (Exception e) {
-				displayMessage("\nUnknown object type recevied");
+				System.out.println("\nUnknown object type recevied");
 				break;
 			}
 		}
@@ -314,15 +319,14 @@ public class Client {
 
 
 
-	public void startClient(){
+	private void startClient(){
 		while(true){
 			try {
 				openConnection();
 				client_connection_loop();
-
 			} 
 			catch (IOException e) {
-				displayMessage("\nIOexception\n");
+				System.out.println("\nIOexception\n");
 			}
 		}
 	}
@@ -330,24 +334,22 @@ public class Client {
 
 
 	private void openConnection() throws IOException{
-		displayMessage("Attempting connection\n");
-		client = new Socket(InetAddress.getByName(serverIP), 12349);		
-		displayMessage("Connected to: " + client.getInetAddress().getHostName());
+		System.out.println("Attempting connection\n");
+		client = new Socket(InetAddress.getByName(serverIP), serverPORT);		
+		System.out.println("Connected to: " + client.getInetAddress().getHostName());
 
 		//ObjectOutputStream **MUST** be created first
 		output = new ObjectOutputStream(client.getOutputStream());
 		output.flush();
 		input = new ObjectInputStream(client.getInputStream());
 
-		displayMessage("\nGot I/O streams\n");
+		System.out.println("\nGot I/O streams\n");
 
 	}
 
 
-
-
 	private void closeConnection(){
-		displayMessage("\nClosing connection\n");
+		System.out.println("\nClosing connection\n");
 
 		try{
 			output.close();
@@ -359,18 +361,7 @@ public class Client {
 		}
 	}
 
-
-
-	private void displayMessage(final String messageToDisplay){
-		SwingUtilities.invokeLater(new Runnable() {
-			@Override
-			public void run() {
-				System.out.println(messageToDisplay);
-			}
-		});
-	}
-
-
+	
 	//----------------------------------------------------------------------------------------------------------------------
 
 
